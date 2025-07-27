@@ -3,7 +3,7 @@
 * [Prerequisites](#id10)
 * [Instalación de Kubernetes](#id20)
   * [Kubespray](#id21)
-  * [CNI: Cilium](#id22)
+  * [Cilium (CNI)](#id22)
 * [Instalación de Aplicaciones](#id30)
   * [Metrics Server](#id31)
 
@@ -18,6 +18,8 @@ Puntos a revisar antes de instalar Kubespray:
 ## Kubespray <div id='id21' />
 
 Instalamos Kubernetes
+
+:raised_hand: La instalación de K8s tarda unos 45min
 
 ```
 $ make pre_install
@@ -35,7 +37,7 @@ pi-k8s-nd-113   NotReady   <none>          31m   v1.31.4
 pi-k8s-nd-115   NotReady   <none>          31m   v1.31.4
 ```
 
-## CNI: Cilium <div id='id22' />
+## Cilium (CNI)<div id='id22' />
 
 Instalamos Helm i Cilium:
 
