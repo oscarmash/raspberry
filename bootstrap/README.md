@@ -65,7 +65,7 @@ NAME        DISABLED   CONFLICTING   IPS AVAILABLE   AGE
 pool-ilba   false      False         0               16m
 ```
 
-# Instalación de Aplicaiones <div id='id30' />
+# Instalación de Aplicaciones <div id='id30' />
 
 ## Metrics Server <div id='id31' />
 
@@ -74,6 +74,11 @@ $ make install_applications_tag TAG=metrics-server_installation
 ```
 
 ```
+root@pi-k8s-cp-111:~# helm ls -A
+NAME            NAMESPACE       REVISION        UPDATED                                         STATUS          CHART                   APP VERSION
+cilium          kube-system     1               2025-07-27 12:07:49.613462794 +0200 CEST        deployed        cilium-1.17.6           1.17.6
+metrics-server  kube-system     1               2025-07-27 12:08:49.758995911 +0200 CEST        deployed        metrics-server-3.12.2   0.7.2
+
 root@pi-k8s-cp-111:~# kubectl top nodes
 NAME            CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 pi-k8s-cp-111   416m         12%    2158Mi          30%
