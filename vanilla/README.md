@@ -1,1 +1,0 @@
-Aquí irá la documentación del despliegue de kubespray y de sus aplicaciones
