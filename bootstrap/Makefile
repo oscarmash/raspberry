@@ -21,7 +21,7 @@ pre_install:
 	$(BIN) ansible-playbook -i inventory/inventory.ini playbooks_custom/pre_install.yaml -b
 
 install_kubespray:
-	$(BIN) ansible-playbook -i inventory/inventory.ini -e kube_version=$(KUBE_VERSION) -e "@variables_kubespray.yml" -b
+	$(BIN) ansible-playbook -i inventory/inventory.ini playbooks/cluster.yml -e kube_version=$(KUBE_VERSION) -e "@variables_kubespray.yml" -b
 
 ########################
 
