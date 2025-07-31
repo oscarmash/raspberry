@@ -60,3 +60,41 @@
         path: "{{ bashrc }}"
         line: alias kcdp='kubectl delete pod --grace-period=0 --force'
         create: true
+
+- name: Remove ntp install chrony
+  hosts: k8s_cluster
+  gather_facts: false
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  tasks:
+
+    - name: Remove "ntp, sntp, and systemd-timesyncd" packages
+      ansible.builtin.apt:
+        name:
+          - ntp
+          - sntp
+          - systemd-timesyncd
+        state: absent
+        purge: true
+      tags: chrony
+
+    - name: Instalar paquet chrony
+      ansible.builtin.apt:
+        name:
+          - chrony
+        state: present
+      tags: chrony
+
+    - name: Enable chrony
+      ansible.builtin.service:
+        name: chrony
+        enabled: true
+      tags: chrony
+
+    - name: Configure chrony
+      ansible.builtin.copy:
+        src: files/chrony.conf
+        dest: /etc/chrony/chrony.conf
+        owner: root
+        group: root
+        mode: '0644'
+      tags: chrony
