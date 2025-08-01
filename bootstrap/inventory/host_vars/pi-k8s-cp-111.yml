@@ -1,3 +1,4 @@
 helm_release: v3.16.4
 chart_version_metrics_server: 3.12.2
 chart_version_cilium: 1.17.6
+chart_version_ingress_nginx: 4.13.0

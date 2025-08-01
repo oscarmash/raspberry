@@ -6,6 +6,7 @@
   * [Cilium (CNI)](#id22)
 * [Instalación de Aplicaciones](#id30)
   * [Metrics Server](#id31)
+  * [Ingress nginx](#id32)
 
 # Prerequisites: <div id='id10' />
 
@@ -85,4 +86,9 @@ pi-k8s-cp-111   416m         12%    2158Mi          30%
 pi-k8s-nd-112   76m          2%     1382Mi          19%
 pi-k8s-nd-113   77m          2%     1365Mi          19%
 pi-k8s-nd-115   72m          2%     1465Mi          20%
+```
+## Ingress nginx <div id='id32' />
+
+```
+$ make install_applications_tag TAG=ingress-nginx_installation
 ```

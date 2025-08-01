@@ -65,12 +65,6 @@
         state: present
       tags: cilium_installation, cilium_config
 
-    - name: Apply deploy a simple sample project
-      k8s:
-        definition: "{{ lookup('file', '/kubespray/cluster-apps/configs/test-ingress/app.yaml') | from_yaml_all }}"
-        state: present
-      tags: cilium_installation, cilium_config
-
 # Metrics Server installation
 - name: Metrics server installation and configuration
   hosts: kube_control_plane
@@ -90,3 +84,21 @@
           args: 
             - --kubelet-insecure-tls
       tags: metrics-server_installation
+
+# Ingress-nginx installation
+- name: Ingress-nginx installation and configuration
+  hosts: kube_control_plane
+  gather_facts: false
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  tasks:
+    - name: Install ingress-nginx Chart
+      kubernetes.core.helm:
+        binary_path: /usr/local/bin/helm
+        name: ingress-nginx
+        create_namespace: true
+        namespace: ingress-nginx
+        chart_repo_url: https://kubernetes.github.io/ingress-nginx
+        chart_ref: ingress-nginx
+        chart_version: "{{ chart_version_ingress_nginx }}"
+        wait: true
+      tags: ingress-nginx_installation
