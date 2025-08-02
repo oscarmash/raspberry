@@ -26,6 +26,7 @@
         pkg:
           - ethtool
           - sudo
+          - jq
         state: latest
         update_cache: true
 

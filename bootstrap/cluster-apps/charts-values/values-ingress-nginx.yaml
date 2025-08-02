@@ -5,3 +5,4 @@ controller:
   publishService:
     enabled: true
   kind: DaemonSet
+  allowSnippetAnnotations: true
