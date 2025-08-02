@@ -64,6 +64,10 @@ cilium  kube-system     1               2025-07-27 10:30:22.894487773 +0200 CEST
 root@pi-k8s-cp-111:~# kubectl get ippools
 NAME        DISABLED   CONFLICTING   IPS AVAILABLE   AGE
 pool-ilba   false      False         0               16m
+
+root@pi-k8s-cp-111:~# kubectl -n kube-system get svc cilium-ingress
+NAME             TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                      AGE
+cilium-ingress   LoadBalancer   10.233.42.200   172.26.0.110   80:31250/TCP,443:32551/TCP   5d22h
 ```
 
 # Instalación de Aplicaciones <div id='id30' />
@@ -91,4 +95,21 @@ pi-k8s-nd-115   72m          2%     1465Mi          20%
 
 ```
 $ make install_applications_tag TAG=ingress-nginx_installation
+```
+
+```
+root@pi-k8s-cp-111:~# helm -n ingress-nginx ls
+NAME            NAMESPACE       REVISION        UPDATED                                         STATUS          CHART                   APP VERSION
+ingress-nginx   ingress-nginx   1               2025-08-02 11:01:52.396616964 +0200 CEST        deployed        ingress-nginx-4.13.0    1.13.0
+
+root@pi-k8s-cp-111:~# kubectl -n ingress-nginx get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+ingress-nginx-controller-2xz5h   1/1     Running   0          2m14s
+ingress-nginx-controller-m62bb   1/1     Running   0          2m14s
+ingress-nginx-controller-p75p6   1/1     Running   0          2m14s
+
+
+root@pi-k8s-cp-111:~# kubectl -n ingress-nginx get svc ingress-nginx-controller
+NAME                       TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                      AGE
+ingress-nginx-controller   LoadBalancer   10.233.48.27   172.26.0.109   80:31865/TCP,443:31524/TCP   2m28s
 ```
