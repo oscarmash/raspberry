@@ -161,6 +161,15 @@ $ kubectl label node pi-k8s-nd-115 topology.rook.io/cephnode=true
 ```
 
 ```
+$ cat <<EOF > values-rook.yaml
+nodeSelector:
+  topology.rook.io/cephnode: "true"
+monitoring:
+  enabled: true
+EOF
+```
+
+```
 $ helm upgrade --install \
 rook-ceph rook-release/rook-ceph \
 --create-namespace \
