@@ -15,7 +15,9 @@
     * [Pool RBD](#id45)
       * [Create Pool RBD](#id46)
       * [Test Pool RBD](#id47)
-
+   * [Pool CephFS](#id48)
+      * [Create Pool CephFS](#id49)
+      * [Test Pool CephFS](#id50)
 
 # Prerequisites: <div id='id10' />
 
@@ -534,6 +536,146 @@ httpd-deployment-569f4f96fd-9s8dw   1/1     Running   0          43s
 root@pi-k8s-cp-111:~# POD=`kubectl -n test-csi get pods | grep http | awk '{print $1}'`
 root@pi-k8s-cp-111:~# k -n test-csi exec -it $POD -- df -h | grep rbd0
 /dev/rbd0       974M   24K  958M   1% /mydata
+```
+
+```
+root@pi-k8s-cp-111:~# k -n test-csi delete deploy httpd-deployment
+root@pi-k8s-cp-111:~# k -n test-csi delete pvc pvc-fs-apache
+root@pi-k8s-cp-111:~# k delete ns test-csi
+```
+
+
+
+
+### Pool CephFS <div id='id48' />
+#### Create Pool CephFS <div id='id49' />
+
+```
+$ cat <<EOF > rook-pool-cephfs-sc.yaml
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  name: pool-cephfs-k8s
+  namespace: rook-ceph
+spec:
+  metadataPool:
+    failureDomain: row
+    replicated:
+      size: 2
+      replicasPerFailureDomain: 1
+  dataPools:
+    - name: data
+      failureDomain: row
+      replicated:
+        size: 2
+        requireSafeReplicaSize: true
+  metadataServer:
+    activeCount: 1
+    activeStandby: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-cephfs
+provisioner: rook-ceph.cephfs.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  fsName: pool-cephfs-k8s
+  pool: pool-cephfs-k8s-data
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+EOF
+```
+
+```
+root@pi-k8s-cp-111:~# k apply -f rook-pool-cephfs-sc.yaml
+```
+
+```
+root@pi-k8s-cp-111:~# kubectl -n rook-ceph get CephFilesystem
+NAME            ACTIVEMDS   AGE   PHASE
+fs-cephfs-k8s   1           33s   Ready
+
+root@pi-k8s-cp-111:~# k get sc rook-cephfs
+NAME          PROVISIONER                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+rook-cephfs   rook-ceph.cephfs.csi.ceph.com   Delete          Immediate           true                   7m35s
+```
+
+#### Test Pool CephFS <div id='id50' />
+
+```
+$ cat <<EOF > rook-test-cephfs.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-csi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-fs-apache
+  namespace: test-csi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-cephfs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  namespace: test-csi
+spec:
+  selector:
+    matchLabels:
+      app: httpd
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /mydata
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: pvc-fs-apache
+EOF
+```
+
+```
+root@pi-k8s-cp-111:~# k apply -f rook-test-cephfs.yaml
+```
+
+```
+root@pi-k8s-cp-111:~# k -n test-csi get pvc
+NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+pvc-fs-apache   Bound    pvc-6f415419-1414-42d5-84a1-061c4537ad7a   1Gi        RWO            rook-cephfs    <unset>                 4s
+
+root@pi-k8s-cp-111:~# k -n test-csi get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+httpd-deployment-569f4f96fd-bz2r8   1/1     Running   0          23s
+
+root@pi-k8s-cp-111:~# POD=`kubectl -n test-csi get pods | grep http | awk '{print $1}'`
+root@pi-k8s-cp-111:~# k -n test-csi exec -it $POD -- df -h | grep cephfs
+csi-cephfs-node@5d5e1491-8606-4473-b192-cc3f9c74cff9.pool-cephfs-k8s=/volumes/csi/csi-vol-f0f6d3fd-f0ee-4ba5-85e9-063c6c3c8421/743323f8-feeb-4c20-a2fc-9799ceb4a35b  1.0G     0  1.0G   0% /mydata
 ```
 
 ```
