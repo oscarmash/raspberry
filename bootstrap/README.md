@@ -149,36 +149,14 @@ vda    254:0    0  100G  0 disk
 ```
 
 ```
-$ helm repo add rook-release https://charts.rook.io/release
-$ helm repo update
-$ helm search repo rook-release/rook-ceph -l | head -n 5
-```
-
-```
 $ kubectl label node pi-k8s-nd-112 topology.rook.io/cephnode=true
 $ kubectl label node pi-k8s-nd-113 topology.rook.io/cephnode=true
 $ kubectl label node pi-k8s-nd-115 topology.rook.io/cephnode=true
 ```
 
 ```
-$ cat <<EOF > values-rook.yaml
-nodeSelector:
-  topology.rook.io/cephnode: "true"
-monitoring:
-  enabled: true
-EOF
+$ make install_applications_tag TAG=rook_installation
 ```
-
-```
-$ helm upgrade --install \
-rook-ceph rook-release/rook-ceph \
---create-namespace \
---namespace rook-ceph \
---version=v1.17.6 \
--f values-rook.yaml
-```
-
-:raised_hand: En arrancar el pod de rook-ceph-operator tarda unos 2 minutos
 
 ```
 $ kubectl -n rook-ceph get pods
@@ -348,15 +326,6 @@ ID   CLASS  WEIGHT   TYPE NAME                   STATUS  REWEIGHT  PRI-AFF
   2    hdd  1.00000              osd.2               up   1.00000  1.00000
 ```
 
-```
-bash-5.1$ ceph osd crush rule create-replicated replica_row default row
-
-bash-5.1$ ceph osd crush rule ls
-replicated_rule
-replica_row
-
-bash-5.1$ exit
-```
 
 ### Dashboard <div id='id44' />
 
@@ -445,7 +414,6 @@ ID  HOST            USED  AVAIL  WR OPS  WR DATA  RD OPS  RD DATA  STATE
  2  pi-k8s-nd-115  26.8M  35.9G      0        0       0        0   exists,up
 
 bash-5.1$ ceph osd pool set .mgr size 2
-
 bash-5.1$ ceph osd lspools
 1 .mgr
 
@@ -463,6 +431,8 @@ spec:
   failureDomain: host
   replicated:
     size: 2
+    replicasPerFailureDomain: 1
+    subFailureDomain: row
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass

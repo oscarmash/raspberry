@@ -104,3 +104,23 @@
         release_state: present
         wait: true
       tags: ingress-nginx_installation
+
+# Rook installation
+- name: Rook installation
+  hosts: kube_control_plane
+  gather_facts: false
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  tasks:
+    - name: Install Rook Chart
+      kubernetes.core.helm:
+        binary_path: /usr/local/bin/helm
+        name: rook-ceph
+        create_namespace: true
+        namespace: rook-ceph
+        chart_repo_url: https://charts.rook.io/release
+        chart_ref: rook-ceph
+        chart_version: "{{ chart_version_rook }}"
+        values: "{{ lookup('template', '/kubespray/cluster-apps/charts-values/values-rook.yaml') | from_yaml }}"
+        release_state: present
+        wait: true
+      tags: rook_installation
