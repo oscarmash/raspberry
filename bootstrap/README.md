@@ -425,14 +425,13 @@ $ cat <<EOF > rook-pool-sc.yaml
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
-  name: pool-k8s
+  name: pool-rbd-k8s
   namespace: rook-ceph
 spec:
-  failureDomain: host
+  failureDomain: row
   replicated:
     size: 2
     replicasPerFailureDomain: 1
-    subFailureDomain: row
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -441,7 +440,7 @@ metadata:
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
   clusterID: rook-ceph
-  pool: pool-k8s
+  pool: pool-rbd-k8s
   imageFormat: "2"
   imageFeatures: layering
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
@@ -460,8 +459,8 @@ EOF
 root@pi-k8s-cp-111:~# k apply -f rook-pool-sc.yaml
 
 root@pi-k8s-cp-111:~# k -n rook-ceph get cephblockpool
-NAME       PHASE   TYPE         FAILUREDOMAIN   AGE
-pool-k8s   Ready   Replicated   host            35s
+NAME           PHASE   TYPE         FAILUREDOMAIN   AGE
+pool-rbd-k8s   Ready   Replicated   row             15s
 
 root@pi-k8s-cp-111:~# k -n rook-ceph get sc
 NAME              PROVISIONER                  RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
