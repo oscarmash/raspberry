@@ -15,9 +15,9 @@
     * [Pool RBD](#id45)
       * [Create Pool RBD](#id46)
       * [Test Pool RBD](#id47)
-   * [Pool CephFS](#id48)
-      * [Create Pool CephFS](#id49)
-      * [Test Pool CephFS](#id50)
+     * [Pool CephFS](#id48)
+        * [Create Pool CephFS](#id49)
+        * [Test Pool CephFS](#id50)
 
 # Prerequisites: <div id='id10' />
 
