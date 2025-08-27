@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export KUBECONFIG=/root/.kube/config
+
+/bin/sleep 300 # 5min
+
+kubectl -n vault delete pods vault-0 vault-1 vault-2
+
+/bin/sleep 120 # 2min
+
+VAULT_0=`kubectl -n vault get pod vault-0 -o wide | grep -v IP | awk {'print $6'}`
+VAULT_1=`kubectl -n vault get pod vault-1 -o wide | grep -v IP | awk {'print $6'}`
+VAULT_2=`kubectl -n vault get pod vault-2 -o wide | grep -v IP | awk {'print $6'}`
+
+TOKEN_ROOT="{{ vault.token_root }}"
+
+KEY=(
+     "{{ vault.token_unseal_1 }}"
+     "{{ vault.token_unseal_2 }}"
+     "{{ vault.token_unseal_3 }}"
+    )
+
+for i in "${KEY[@]}"; do
+    echo "$i"
+    export VAULT_ADDR=http://$VAULT_0:8200
+    vault operator unseal $i
+    export VAULT_ADDR=http://$VAULT_1:8200
+    vault operator unseal $i
+    export VAULT_ADDR=http://$VAULT_2:8200
+    vault operator unseal $i
+    echo ""
+    sleep 5
+done

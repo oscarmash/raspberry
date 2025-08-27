@@ -1,0 +1,11 @@
+[Unit]
+Description="Unseal Vault"
+Wants=kubelet.service
+
+[Service]
+ExecStart=/usr/local/sbin/unsealt_vault_script.sh
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

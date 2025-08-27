@@ -99,3 +99,64 @@
         group: root
         mode: '0644'
       tags: chrony
+
+- name: Neofetch
+  hosts: k8s_cluster
+  gather_facts: false
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  tasks:
+
+    - name: Installing 'neofetch' package
+      apt:
+        pkg:
+          - neofetch
+      tags: neofetch
+
+    - name: Clean motd
+      shell: rm -rf /etc/update-motd.d/*
+      tags: neofetch
+
+    - name: Copy file '/etc/ssh/neofetch.conf'
+      ansible.builtin.copy:
+        src: files/neofetch.conf
+        dest: /etc/ssh/neofetch.conf
+        owner: root
+        group: root
+        mode: '0755'
+      tags: neofetch
+
+    - name: Remove PrintLastLog
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "#PrintLastLog yes"
+        replace: "PrintLastLog no"
+      tags: neofetch
+
+    - name: Restarting ssh service
+      service:
+        name: "ssh"
+        state: restarted
+      tags: neofetch
+
+    - name: Search 'neofetch' in '/etc/profile'
+      shell: grep -c "^neofetch --config /etc/ssh/neofetch.conf" /etc/profile | true
+      register: register_neofetch
+      tags: neofetch
+
+    - name: Add 'neofetch' to '/etc/profile'
+      lineinfile:
+        dest: /etc/profile
+        line: neofetch --config /etc/ssh/neofetch.conf
+      when: register_neofetch.stdout != "0"
+      tags: neofetch
+
+    - name: Search '/etc/motd'
+      stat:
+        path: /etc/motd
+      register: register_motd
+      tags: neofetch
+
+    - name: If '/etc/motd' exist, remove
+      shell: rm -rf /etc/motd
+      when: register_motd.stat.exists
+      tags: neofetch

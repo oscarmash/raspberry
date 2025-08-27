@@ -3,3 +3,10 @@ chart_version_metrics_server: 3.12.2
 chart_version_cilium: 1.17.6
 chart_version_ingress_nginx: 4.11.1
 chart_version_rook: v1.17.6
+chart_version_vault: 0.30.1
+
+vault:
+  token_root: "hvs.WTfgGavstj8jDmbg7qkyQsXx"
+  token_unseal_1: "zdCclz//gpr5vR6USv/6+4kfgqQN/0KB37h5w4CZsikF"
+  token_unseal_2: "QO0nFxz4MqR1FhRUZD7VwHRF8vV6gkP2iKsyxHNvfh8"
+  token_unseal_3: "gECzNPcB9E/3oSe6K65gg7zCHxb1yosY4P2dDHsqBNdA"

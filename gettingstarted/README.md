@@ -8,7 +8,7 @@ Pasos:
 * [Trabajando con el equipo remotamente](#id20)
   * [Config básica](#id21)
   * [MicroSD to NVMe](#id22)
-  * [Neofetch](#id23)
+  * [~~Neofetch~~](#id23)
 
 # Trabajando desde el equipo físico <div id='id10' />
 
@@ -34,8 +34,13 @@ Personalización del S.O.:
 ```
 $ sudo nmcli radio wifi on
 $ nmtui
-    172.26.0.111
-    192.168.100.111
+```
+IP's:
+
+* Wifi: 172.26.0.111
+* LAN: 192.168.100.111
+
+```
 $ sudo reboot
 ```
 
@@ -63,13 +68,11 @@ root@pi-k8s-cp-111:/home/oscar.mas# reboot
 
 ```
 $ ssh-copy-id -i $HOME/.ssh/id_rsa.pub 172.26.0.111
+$ ssh-copy-id -i $HOME/.ssh/id_rsa.pub oscar.mas@172.26.0.111
 $ ssh 172.26.0.111
 ```
 
 ```
-root@pi-k8s-cp-111:~# userdel oscar.mas
-root@pi-k8s-cp-111:~# rm -rf /home/oscar.mas
-
 root@pi-k8s-cp-111:~# echo "set mouse=c" > $HOME/.vimrc
 root@pi-k8s-cp-111:~# echo "syntax on" >> $HOME/.vimrc
 root@pi-k8s-cp-111:~# echo "set background=dark" >> $HOME/.vimrc
@@ -101,7 +104,7 @@ mmcblk0     179:0    0 119.1G  0 disk
 nvme0n1     259:0    0 476.9G  0 disk
 ```
 
-:warning: El siguiente paso tarda muchísimo :warning:
+:warning: El siguiente paso tarda unos 25 minutos :warning:
 
 ```
 root@pi-k8s-cp-111:~# sudo dd bs=4M if=/dev/mmcblk0 of=/dev/nvme0n1 status=progress oflag=sync
@@ -116,7 +119,7 @@ root@pi-k8s-cp-111:~# poweroff
 
 Sacamos la tarjeta MicroSD
 
-## Neofetch <div id='id23' />
+## ~~Neofetch~~ <div id='id23' />
 
 ```
 $ scp files/neofetch.conf 172.26.0.111:/etc/ssh/neofetch.conf

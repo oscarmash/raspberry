@@ -1,0 +1,53 @@
+injector:
+  enabled: false
+ui:
+  enabled: true
+server:
+  enabled: true
+  affinity:
+  resources: {}
+  ingress:
+    enabled: true
+    labels:
+      traffic: external
+    ingressClassName: "nginx"
+    activeService: true
+    hosts:
+      - host: vault.pi.ilba.cat
+        paths: []
+  dataStorage:
+    size : 10Gi
+    storageClass: rook-ceph-block
+  standalone:
+    enabled: false
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      setNodeId: true
+
+      config: |
+        ui = true
+        disable_mlock = true
+        cluster_name = "pi-vault-k8s"
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+          retry_join {
+            leader_api_addr = "http://vault-0.vault-internal.vault.svc.cluster.local:8200"
+          }
+          retry_join {
+            leader_api_addr = "http://vault-1.vault-internal.vault.svc.cluster.local:8200"
+          }
+          retry_join {
+            leader_api_addr = "http://vault-2.vault-internal.vault.svc.cluster.local:8200"
+          }
+        }
+
+        service_registration "kubernetes" {}
