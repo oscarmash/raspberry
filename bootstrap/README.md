@@ -361,7 +361,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: pi-ceph.ilba.cat
+    - host: ceph.pi.ilba.cat
       http:
         paths:
           - path: /
@@ -379,7 +379,7 @@ root@pi-k8s-cp-111:~# k apply -f rook-cephdashboard.yaml
 
 root@pi-k8s-cp-111:~# k -n rook-ceph get ingress
 NAME                  CLASS   HOSTS              ADDRESS        PORTS   AGE
-rook-ceph-dashboard   nginx   pi-ceph.ilba.cat   172.26.0.109   80      43s
+rook-ceph-dashboard   nginx   ceph.pi.ilba.cat   172.26.0.109   80      43s
 ```
 
 Acceso:
