@@ -5,11 +5,11 @@
   tasks:
 
     - name: Disable SWAP since kubernetes can't work with swap enabled
-      shell: |
+      ansible.builtin.shell: |
         swapoff -a
 
     - name: Remove multiple packages
-      apt:
+      ansible.builtin.apt:
         name:
           - dphys-swapfile
           - zram-tools
@@ -22,7 +22,7 @@
         replace: '# \1'
 
     - name: Installing multiple packages
-      apt:
+      ansible.builtin.apt:
         pkg:
           - ethtool
           - sudo
@@ -107,13 +107,13 @@
   tasks:
 
     - name: Installing 'neofetch' package
-      apt:
+      ansible.builtin.apt:
         pkg:
           - neofetch
       tags: neofetch
 
     - name: Clean motd
-      shell: rm -rf /etc/update-motd.d/*
+      ansible.builtin.shell: rm -rf /etc/update-motd.d/*
       tags: neofetch
 
     - name: Copy file '/etc/ssh/neofetch.conf'
@@ -139,7 +139,7 @@
       tags: neofetch
 
     - name: Search 'neofetch' in '/etc/profile'
-      shell: grep -c "^neofetch --config /etc/ssh/neofetch.conf" /etc/profile | true
+      ansible.builtin.shell: grep -c "^neofetch --config /etc/ssh/neofetch.conf" /etc/profile | true
       register: register_neofetch
       tags: neofetch
 
@@ -157,6 +157,6 @@
       tags: neofetch
 
     - name: If '/etc/motd' exist, remove
-      shell: rm -rf /etc/motd
+      ansible.builtin.shell: rm -rf /etc/motd
       when: register_motd.stat.exists
       tags: neofetch
